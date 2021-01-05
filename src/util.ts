@@ -6,10 +6,6 @@
  * @LastEditTime: 2020-12-31 09:46:40
  * @FilePath: \webgl-practice\src\util.ts
  */
-export function formatTime(){
-    
-}
-
 /**
  * 创建着色器方法
  * @param gl {WebGLRenderingContext} 渲染上下文
@@ -43,3 +39,5 @@ export function createShader(gl: WebGLRenderingContext, type: number, source: st
     console.log(gl.getProgramInfoLog(program));
     gl.deleteProgram(program);
   }
+
+  
