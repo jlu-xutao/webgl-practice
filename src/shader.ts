@@ -11,9 +11,13 @@ export let vertexShaderSource = `
 
     attribute vec4 a_color;
 
+    attribute vec2 a_texCoord;
+
     uniform vec2 u_resolution;
 
     varying vec4 v_color;
+
+    varying vec2 v_texCoord;
 
     // 所有着色器都有一个main方法
     void main() {
@@ -31,6 +35,8 @@ export let vertexShaderSource = `
 
         v_color = a_color;
 
+        v_texCoord = a_texCoord;
+
     }
 `
 
@@ -40,8 +46,12 @@ export let fragmentShaderSource = `
     precision mediump float;
     uniform vec4 u_color;
     varying vec4 v_color;
+    varying vec2 v_texCoord;
+    // 纹理
+    uniform sampler2D u_image;
     void main() {
         // gl_FragColor是一个片断着色器主要设置的变量
-        gl_FragColor = v_color;
+        // gl_FragColor = v_color;
+        gl_FragColor = texture2D(u_image, v_texCoord);
     }
 `

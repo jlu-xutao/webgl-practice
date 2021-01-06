@@ -7,8 +7,8 @@
  * @FilePath: \webgl-practice\src\app.ts
  */
 import './css/style.scss'
-import { fragmentShaderSource, vertexShaderSource } from './shader.ts'
-import { createProgram, createShader } from './util.ts'
+import { fragmentShaderSource, vertexShaderSource } from './shader'
+import { createProgram, createShader, loadImage } from './util'
 function getShaderProgram(gl: WebGLRenderingContext) {
     let vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource)
     let fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource)
@@ -22,7 +22,7 @@ function getShaderProgram(gl: WebGLRenderingContext) {
 
     return program
 }
-function main() {
+function drawScene(image: HTMLImageElement) {
     let myCanvas = document.getElementById('myCanvas') as HTMLCanvasElement
     // myCanvas.width = document.documentElement.clientWidth
     // myCanvas.height = document.documentElement.clientHeight
@@ -33,10 +33,10 @@ function main() {
         alert("无法初始化WebGL，你的浏览器、操作系统或硬件等可能不支持WebGL。")
         return
     }
-    gl.viewport(10, 10, gl.canvas.width, gl.canvas.height * 4)
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
     // gl.scissor(0, 0, gl.canvas.width >> 2, gl.canvas.height >> 2)
     console.log(gl.getParameter(gl.VIEWPORT), gl.canvas.width, gl.canvas.height, gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS)
-    
+
     let viewport = gl.getParameter(gl.VIEWPORT) as Int32Array
     console.log(viewport[3])
     // 设置清空颜色缓冲时的颜色111
@@ -55,10 +55,12 @@ function main() {
     gl.enableVertexAttribArray(positionAttributeLocation)
     let colorAttributeLocation = gl.getAttribLocation(program, "a_color")
     gl.enableVertexAttribArray(colorAttributeLocation)
+    // 找到纹理的地址
+    let texCoordLocation = gl.getAttribLocation(program, "a_texCoord")
 
     let resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution")
-
     let colorUniformLocation = gl.getUniformLocation(program, "u_color")
+
 
     // 告诉它用我们之前写好的着色程序（一个着色器对）
     gl.useProgram(program)
@@ -69,9 +71,11 @@ function main() {
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
         // 点坐标像素坐标
         let positions = [
+            0.0, 60.0,
+            184.0, 60.0,
             0.0, 0.0,
-            180.0, 0.0,
-            0.0, 150.0,
+            184.0, 60.0,
+
         ]
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW)
     }
@@ -92,7 +96,7 @@ function main() {
     }
 
     let colorBuffer = gl.createBuffer()
-    
+
     {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
@@ -116,6 +120,30 @@ function main() {
             colorAttributeLocation, size, type, normalize, stride, offset)
     }
 
+    let texCoordBuffer = gl.createBuffer()
+    {
+        gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer)
+        let texCoords = [
+            0.0, 0.0,
+            1.0, 0.0,
+            0.0, 1.0,]
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoords), gl.STATIC_DRAW)
+        gl.enableVertexAttribArray(texCoordLocation)
+        gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0)
+
+        // 创建纹理
+        let texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        // 设置参数，让我们可以绘制任何尺寸的图像
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        // 将图像上传到纹理
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    }
+
+
     gl.uniform2f(resolutionUniformLocation, viewport[2], viewport[3])
 
     gl.uniform4f(colorUniformLocation, Math.random(), Math.random(), Math.random(), 1)
@@ -126,6 +154,12 @@ function main() {
         let count = 3
         gl.drawArrays(primitiveType, offset, count)
     }
+
+}
+function main() {
+    loadImage('./images/googlelogo.png', (image: HTMLImageElement) => {
+        drawScene(image)
+    })
 
 }
 main()

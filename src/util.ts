@@ -40,4 +40,10 @@ export function createShader(gl: WebGLRenderingContext, type: number, source: st
     gl.deleteProgram(program);
   }
 
-  
+  export function loadImage(src: string, cb: Function){
+    var image = new Image();
+    image.src = src;  // 必须在同一域名下
+    image.onload = function() {
+      cb(image);
+    }
+  }
