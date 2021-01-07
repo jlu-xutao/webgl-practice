@@ -71,11 +71,12 @@ function drawScene(image: HTMLImageElement) {
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
         // 点坐标像素坐标
         let positions = [
+            0.0, 0.0,
             0.0, 60.0,
             184.0, 60.0,
-            0.0, 0.0,
             184.0, 60.0,
-
+            0.0, 0.0,
+            184.0, 0.0,
         ]
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW)
     }
@@ -125,8 +126,12 @@ function drawScene(image: HTMLImageElement) {
         gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer)
         let texCoords = [
             0.0, 0.0,
+            0.0, 1.0,
             1.0, 0.0,
-            0.0, 1.0,]
+            1.0, 1.0,
+            0.0, 0.0,
+            1.0, 0.0,
+        ]
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoords), gl.STATIC_DRAW)
         gl.enableVertexAttribArray(texCoordLocation)
         gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0)
@@ -151,7 +156,7 @@ function drawScene(image: HTMLImageElement) {
     {
         let primitiveType = gl.TRIANGLES
         let offset = 0
-        let count = 3
+        let count = 6
         gl.drawArrays(primitiveType, offset, count)
     }
 
